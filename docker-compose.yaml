@@ -1,0 +1,38 @@
+services:
+#first we define the sevice for our express app'
+# create image for express app
+  express-app:
+    #build the docker image
+    build:
+      context: .
+
+    #  forwarding the port 3000 of the container to port 4000 of the host machine
+    ports:
+      - "3000:4000"
+
+    #passing everything in the .env file to the container
+    env_file:
+      - .env
+    volumes:
+    #mounting the current directory to /app in the container
+    # this allows for live reloading of the app during development
+      - .:/app
+      - /app/node_modules
+    # changes in node_modules will not be reflected in the local directory
+    command: npm run dev -- --legacy-watch
+
+  mongo:
+    image: mongo:latest
+    # this is like registration for the mongo service
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
+    # this is a named volume for mongo data
+    # it will persist even if the container is removed
+    # this allows for data persistence across container restarts 
+    # dont use -v with down now
