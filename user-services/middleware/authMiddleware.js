@@ -24,7 +24,7 @@ const protect = async(req, res, next) => {
     req.user = user
     next()
   } catch(e){
-      console.error("error while authenticating user: ", e)
+      // console.error("error while authenticating user: ", e)
       return res.status(401).json({message: "Error while validating json"})
   }
 }
