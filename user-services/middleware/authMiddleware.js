@@ -40,4 +40,4 @@ const restrictTo = (...roles) => {
   }
 }
 
-module.exports({protect, restrictTo})
+module.exports = {protect, restrictTo}
