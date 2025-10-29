@@ -1,38 +1,50 @@
 services:
-#first we define the sevice for our express app'
-# create image for express app
-  express-app:
-    #build the docker image
+  # User Service - handles authentication and user management
+  user-service:
+    # Build the Docker image from the Dockerfile in the user-services folder
     build:
-      context: .
+      context: ./user-services
 
-    #  forwarding the port 3000 of the container to port 4000 of the host machine
+    # Port mapping: "HOST_PORT:CONTAINER_PORT"
+    # Maps port 3000 on your computer to port 3000 inside the container
+    # Access the app at localhost:3000
     ports:
-      - "3000:4000"
+      - "3000:3000"
 
-    #passing everything in the .env file to the container
-    env_file:
-      - .env
+    # Volume mounts for development
     volumes:
-    #mounting the current directory to /app in the container
-    # this allows for live reloading of the app during development
-      - .:/app
+      # Bind mount: Syncs your local code to container for hot-reloading
+      # Everything except node_modules gets synced
+      - ./user-services:/app
+      
+      # Anonymous volume: Protects container's node_modules from being overwritten
+      # Ensures Linux-compatible dependencies are used inside the container
+      # Without this, Windows node_modules could break the Linux container
       - /app/node_modules
-    # changes in node_modules will not be reflected in the local directory
+
+    # Override the default CMD from Dockerfile to run in development mode
+    # --legacy-watch enables file watching for auto-restart on code changes
     command: npm run dev -- --legacy-watch
 
+  # MongoDB Service - the database for storing user data
   mongo:
+    # Use the official MongoDB image from Docker Hub
     image: mongo:latest
-    # this is like registration for the mongo service
+    
+    # Set up MongoDB with a root user and password
+    # These credentials are used to connect to the database
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
+    
+    # Persist database data using a named volume
+    # Data is stored in mongo-data volume instead of inside the container
     volumes:
       - mongo-data:/data/db
 
+# Named volumes - persistent storage that survives container restarts
 volumes:
   mongo-data:
-    # this is a named volume for mongo data
-    # it will persist even if the container is removed
-    # this allows for data persistence across container restarts 
-    # dont use -v with down now
+    # Stores MongoDB data permanently on your host machine
+    # Even if you run 'docker-compose down', this data is preserved
+    # Use 'docker-compose down -v' to remove volumes and delete data
