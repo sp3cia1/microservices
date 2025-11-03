@@ -1,4 +1,12 @@
 services:
+  rabbitmq:
+  image: rabbitmq:3-management
+  ports:
+    - "5672:5672" # RabbitMQ server port
+    - "15672:15672" # Management UI
+  environment:
+    RABBITMQ_DEFAULT_USER: guest
+    RABBITMQ_DEFAULT_PASS: guest
   # User Service - handles authentication and user management
   user-service:
     # Build the Docker image from the Dockerfile in the user-services folder
@@ -25,6 +33,59 @@ services:
     # Override the default CMD from Dockerfile to run in development mode
     # --legacy-watch enables file watching for auto-restart on code changes
     command: npm run dev -- --legacy-watch
+    depends_on:
+      - mongo
+      - rabbitmq
+    
+  product-service:
+    # Build the Docker image from the Dockerfile in the product-services folder
+    build:
+      context: ./product-services
+
+    # Port mapping: "HOST_PORT:CONTAINER_PORT"
+    # Maps port 3001 on your computer to port 3000 inside the container
+    # Access the app at localhost:3001
+    ports:
+      - "3001:3000"
+
+    # Volume mounts for development
+    volumes:
+      # Bind mount: Syncs your local code to container for hot-reloading
+      # Everything except node_modules gets synced
+      - ./product-services:/app
+      
+      # Anonymous volume: Protects container's node_modules from being overwritten
+      # Ensures Linux-compatible dependencies are used inside the container
+      # Without this, Windows node_modules could break the Linux container
+      - /app/node_modules
+    depends_on:
+      - mongo
+      - rabbitmq
+    
+  order-service:
+    # Build the Docker image from the Dockerfile in the order-services folder
+    build:
+      context: ./order-services
+
+    # Port mapping: "HOST_PORT:CONTAINER_PORT"
+    # Maps port 3002 on your computer to port 3000 inside the container
+    # Access the app at localhost:3002
+    ports:
+      - "3002:3000"
+
+    # Volume mounts for development
+    volumes:
+      # Bind mount: Syncs your local code to container for hot-reloading
+      # Everything except node_modules gets synced
+      - ./order-services:/app
+      
+      # Anonymous volume: Protects container's node_modules from being overwritten
+      # Ensures Linux-compatible dependencies are used inside the container
+      # Without this, Windows node_modules could break the Linux container
+      - /app/node_modules
+    depends_on:
+      - mongo
+      - rabbitmq
 
   # MongoDB Service - the database for storing user data
   mongo:
