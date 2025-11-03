@@ -14,6 +14,7 @@ connectDb();
 app.use(express.json())
 async function notifyUser(order) {
   console.log("User service received order:", order);
+  // Mail to user
 }
 app.use('/api/auth', authRoutes)
 
@@ -23,7 +24,7 @@ app.get('/', (req, res) => {
 
 (async () => {
   await connectRabbitMQ();
-  await consumeMessage('orderQueue', notifyUser);
+  consumeMessage('userQueue', notifyUser);
 })();
 
 app.listen(PORT, () => {
