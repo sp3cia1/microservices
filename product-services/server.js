@@ -27,12 +27,15 @@ async function processOrder(order) {
   }
 }
 
-// IIFE to setup RabbitMQ connection and start consuming messages
-(async () => {
-  await connectRabbitMQ();
-  consumeMessage('productQueue', processOrder);
-})();
+app.get('/', (req, res) => {
+  res.send('Product Services is running')
+})
+
 
 app.listen(PORT, () => {
   console.log(`Product service is running on port ${PORT}`);
 });
+(async () => {
+  await connectRabbitMQ();
+  consumeMessage('productQueue', processOrder);
+})();

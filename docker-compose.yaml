@@ -1,12 +1,14 @@
 services:
+  # RabbitMQ - Message broker for inter-service communication
   rabbitmq:
-  image: rabbitmq:3-management
-  ports:
-    - "5672:5672" # RabbitMQ server port
-    - "15672:15672" # Management UI
-  environment:
-    RABBITMQ_DEFAULT_USER: guest
-    RABBITMQ_DEFAULT_PASS: guest
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672" # RabbitMQ server port
+      - "15672:15672" # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+  
   # User Service - handles authentication and user management
   user-service:
     # Build the Docker image from the Dockerfile in the user-services folder
@@ -58,6 +60,10 @@ services:
       # Ensures Linux-compatible dependencies are used inside the container
       # Without this, Windows node_modules could break the Linux container
       - /app/node_modules
+
+    # Override the default CMD from Dockerfile to run in development mode
+    # --legacy-watch enables file watching for auto-restart on code changes
+    command: npm run dev -- --legacy-watch
     depends_on:
       - mongo
       - rabbitmq
@@ -83,6 +89,10 @@ services:
       # Ensures Linux-compatible dependencies are used inside the container
       # Without this, Windows node_modules could break the Linux container
       - /app/node_modules
+
+    # Override the default CMD from Dockerfile to run in development mode
+    # --legacy-watch enables file watching for auto-restart on code changes
+    command: npm run dev -- --legacy-watch
     depends_on:
       - mongo
       - rabbitmq

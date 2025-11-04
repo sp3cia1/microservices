@@ -7,7 +7,7 @@ let channel = null;
  * @param {number} retries - number of retries
  * @param {number} interval - wait time between retries in ms
  */
-async function connectRabbitMQ(retries = 5, interval = 5000) {
+async function connectRabbitMQ(retries = 25, interval = 5000) {
     for (let i = 0; i < retries; i++) {
         try {
             // Use Docker service name, not IP

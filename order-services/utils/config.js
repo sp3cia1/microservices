@@ -1,7 +1,7 @@
 module.exports = {
     MONGO_IP: process.env.MONGO_IP || "mongo",
     MONGO_PORT: process.env.MONGO_PORT || 27017,
-    MONGO_USER: process.env.MONGO_USER,
-    MONGO_PASSWORD: process.env.MONGO_PASSWORD,
-    JWT_SECRET: process.env.JWT_SECRET
+    MONGO_USER: process.env.MONGO_USER || "root",
+    MONGO_PASSWORD: process.env.MONGO_PASSWORD || "root",
+    JWT_SECRET: process.env.JWT_SECRET || "your_jwt_secret"
 }

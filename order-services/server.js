@@ -12,6 +12,10 @@ app.use(express.json());
 
 app.use('/api/orders', orderRoutes);
 
+app.get('/', (req, res) => {
+  res.send('Order Services is running')
+})
+
 consumeMessage("orderQueue", async (msg) => {
     console.log("📩 Received order message:", msg);
     console.log(`Sending notification to user ${msg.userId} for order ${msg.orderId}`);

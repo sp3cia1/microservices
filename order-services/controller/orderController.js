@@ -10,7 +10,7 @@ const placeOrder = async (req, res) => {
         const orderProducts = [];
         for(let i = 0; i < products.length; i++) {
             // const product = await Product.findById(products[i].productId);
-            const response = await axios.get(`http://product-service:3001/api/products/getProduct/${products[i].productId}`);
+            const response = await axios.get(`http://product-service:3000/api/products/getProduct/${products[i].productId}`);
             const product = response.data;
             if(!product) {
                 return res.status(404).json({message: 'Product not found'});
