@@ -1,4 +1,5 @@
 const express = require('express')
+const logger = require('./utils/logger');
 const dotenv = require('dotenv')
 dotenv.config()
 
@@ -13,7 +14,7 @@ connectDb();
 
 app.use(express.json())
 async function notifyUser(order) {
-  console.log("User service received order:", order);
+  logger.info(`User service received order: ${JSON.stringify(order)}`);
   // Mail to user
 }
 app.use('/api/auth', authRoutes)
@@ -22,7 +23,7 @@ app.get('/', (req, res) => {
   res.send('User Services is running')
 })
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`)
+  logger.info(`User service is running on port ${PORT}`);
 });
 
 (async () => {
