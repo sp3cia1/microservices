@@ -1,4 +1,5 @@
 const Product = require('../model/Product');
+const setupRedis = require("../utils/redis");
 
 const addProduct = async (req, res) => {
     try {
@@ -32,13 +33,31 @@ const getAllProducts = async (req, res) => {
 
 const getProductById = async (req, res) => {
     try {
+        const redis = setupRedis();
+        const key = `product:${req.params.id}`;
+        
+        // Look in cache first
+        const cached = await redis.get(key);
+        if(cached) {
+            console.log("✅ Product found in cache");
+            return res.status(200).json(JSON.parse(cached));  // Added return!
+        }
+
+        // Fallback to DB - if product is not in cache
+        console.log("⚠️ Cache miss - fetching from database");
         const product = await Product.findById(req.params.id);
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
+
+        // Store in Cache with 10 minute expiration
+        await redis.set(key, JSON.stringify(product), 'EX', 600);
+        console.log("💾 Product stored in cache");
+
         res.status(200).json(product);
     } catch (error) {
-        res.status(500).json({ message: 'Server Error', error });
+        console.error("❌ Error in getProductById:", error.message);
+        res.status(500).json({ message: 'Server Error', error: error.message });
     }
 }
 
